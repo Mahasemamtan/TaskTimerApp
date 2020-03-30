@@ -1,6 +1,7 @@
 package bojanantic.example.tasktimerapp
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -8,12 +9,35 @@ import android.view.MenuItem
 
 import kotlinx.android.synthetic.main.activity_main.*
 
+private const val TAG = "MainActivity"
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        val appDataBase = AppDataBase.getInstace(this)
+        val db = appDataBase.readableDatabase
+
+        val cursor = db.rawQuery("SELECT * FROM Tasks", null)
+        Log.d(TAG, "**********************************")
+        cursor.use {
+            while(it.moveToNext()) {
+                // Cycle through all records
+                with(cursor) {
+                    val id = getLong(0)
+                    val name = getString(1)
+                    val description = getString(2)
+                    val sortOrder = getString(3)
+                    val result = "ID: $id. Name: $name description: $description sort order: $sortOrder"
+                    Log.d(TAG, ".onCreate: reading data $result")
+                }
+            }
+        }
+
+        Log.d(TAG, "**********************************")
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
