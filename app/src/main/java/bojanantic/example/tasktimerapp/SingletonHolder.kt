@@ -8,12 +8,13 @@ import android.util.Log
 
 private const val TAG = "SingletonHolder"
 
-open class SingletonHolder <out T, in A>(creator: (A) -> (T)) {
+open class SingletonHolder<out T, in A>(creator: (A) -> (T)) {
 
     private var creator: ((A) -> (T))? = creator
-    @Volatile private var instance: T? = null
+    @Volatile
+    private var instance: T? = null
 
-    fun getInstace(arg: A): T {
+    fun getInstance(arg: A): T {
         Log.d(TAG, ".getInstance: started")
         val i = instance
         if (i != null) {

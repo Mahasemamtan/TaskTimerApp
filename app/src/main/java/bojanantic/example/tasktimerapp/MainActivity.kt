@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        val appDataBase = AppDataBase.getInstace(this)
+        val appDataBase = AppDataBase.getInstance(this)
         val db = appDataBase.readableDatabase
 
         val cursor = db.rawQuery("SELECT * FROM Tasks", null)
