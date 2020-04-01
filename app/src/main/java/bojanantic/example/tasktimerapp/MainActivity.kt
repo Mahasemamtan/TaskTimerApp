@@ -2,11 +2,10 @@ package bojanantic.example.tasktimerapp
 
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
@@ -18,18 +17,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        val projection = arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
+        val projection =
+            arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
         val sortColumn = TasksContract.Columns.TASK_SORT_ORDER
 
 //        val cursor = contentResolver.query(TasksContract.CONTENT_URI,
-        val cursor = contentResolver.query(TasksContract.buildUriFromId(2),
+        val cursor = contentResolver.query(
+            TasksContract.buildUriFromId(2),
             projection,
             null,
             null,
-            sortColumn)
+            sortColumn
+        )
         Log.d(TAG, "**********************************")
         cursor.use {
-            while(it!!.moveToNext()) {
+            while (it!!.moveToNext()) {
                 // Cycle through all records
                 with(cursor) {
                     val name = this!!.getString(0)
@@ -44,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+                .setAction("Action", null).show()
         }
     }
 

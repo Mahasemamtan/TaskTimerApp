@@ -4,6 +4,7 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
+import android.database.SQLException
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
 import android.util.Log
@@ -44,7 +45,7 @@ class AppProvider : ContentProvider() {
 
         matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS)
         matcher.addURI(CONTENT_AUTHORITY, "${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
-//
+
 //        matcher.addURI(CONTENT_AUTHORITY, DurationsContract.TABLE_NAME, TASK_DURATION)
 //        matcher.addURI(CONTENT_AUTHORITY, "${DurationsContract.TABLE_NAME}/#", TASK_DURATION_ID)
 
@@ -135,15 +136,141 @@ class AppProvider : ContentProvider() {
         return cursor
     }
 
-    override fun insert(p0: Uri, p1: ContentValues?): Uri? {
-        TODO("Not yet implemented")
+    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+        Log.d(TAG, ".insert: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG, ".insert: matches $match")
+
+        val recordId: Long
+        val returnUri: Uri
+
+        when (match) {
+            TASKS -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                recordId = db.insert(TasksContract.TABLE_NAME, null, values)
+                if (recordId != -1L) {
+                    returnUri = TasksContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Failed to insert, uri was: $uri")
+                }
+            }
+
+            TIMINGS -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                recordId = db.insert(TimingsContract.TABLE_NAME, null, values)
+                if (recordId != -1L) {
+                    returnUri = TasksContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Failed to insert, uri was: $uri")
+                }
+            }
+            else -> throw java.lang.IllegalArgumentException("Unknown uri: $uri")
+        }
+
+        Log.d(TAG, ".insert: exiting insert, returning: $returnUri")
+        return returnUri
     }
 
-    override fun update(p0: Uri, p1: ContentValues?, p2: String?, p3: Array<out String>?): Int {
-        TODO("Not yet implemented")
+    override fun update(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array<out String>?
+    ): Int {
+        Log.d(TAG, ".update: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG, ".update: matches $match")
+
+        val count: Int
+        var selectionCriteria: String
+
+        when (match) {
+            TASKS -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                count = db.update(TasksContract.TABLE_NAME, values, selection, selectionArgs)
+            }
+
+            TASKS_ID -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                val id = TasksContract.getId(uri)
+                selectionCriteria = "${TasksContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND $selection"
+                }
+
+                count =
+                    db.update(TasksContract.TABLE_NAME, values, selectionCriteria, selectionArgs)
+            }
+
+            TIMINGS -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                count = db.update(TimingsContract.TABLE_NAME, values, selection, selectionArgs)
+            }
+
+            TIMINGS_ID -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                val id = TimingsContract.getId(uri)
+                selectionCriteria = "${TimingsContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND $selection"
+                }
+
+                count =
+                    db.update(TimingsContract.TABLE_NAME, values, selectionCriteria, selectionArgs)
+            }
+            else -> throw java.lang.IllegalArgumentException("Unknown uri: $uri")
+        }
+        Log.d(TAG, ".update: Exiting, returning: $count")
+        return count
     }
 
-    override fun delete(p0: Uri, p1: String?, p2: Array<out String>?): Int {
-        TODO("Not yet implemented")
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
+        Log.d(TAG, ".delete: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG, ".delete: matches $match")
+
+        val count: Int
+        var selectionCriteria: String
+
+        when (match) {
+            TASKS -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                count = db.delete(TasksContract.TABLE_NAME, selection, selectionArgs)
+            }
+
+            TASKS_ID -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                val id = TasksContract.getId(uri)
+                selectionCriteria = "${TasksContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND $selection"
+                }
+
+                count = db.delete(TasksContract.TABLE_NAME, selectionCriteria, selectionArgs)
+            }
+
+            TIMINGS -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                count = db.delete(TimingsContract.TABLE_NAME, selection, selectionArgs)
+            }
+
+            TIMINGS_ID -> {
+                val db = AppDataBase.getInstance(context!!).writableDatabase
+                val id = TimingsContract.getId(uri)
+                selectionCriteria = "${TimingsContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND $selection"
+                }
+
+                count = db.delete(TimingsContract.TABLE_NAME, selectionCriteria, selectionArgs)
+            }
+            else -> throw java.lang.IllegalArgumentException("Unknown uri: $uri")
+        }
+        Log.d(TAG, ".update: Exiting, returning: $count")
+        return count
     }
 }
