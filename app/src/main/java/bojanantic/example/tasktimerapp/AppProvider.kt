@@ -42,8 +42,8 @@ class AppProvider : ContentProvider() {
         // e.g. content://bojanantic.example.tasktimerapp.provider/Tasks/8
         matcher.addURI(CONTENT_AUTHORITY, "${TasksContract.TABLE_NAME}/#", TASKS_ID)
 
-//        matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS)
-//        matcher.addURI(CONTENT_AUTHORITY, "${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
+        matcher.addURI(CONTENT_AUTHORITY, TimingsContract.TABLE_NAME, TIMINGS)
+        matcher.addURI(CONTENT_AUTHORITY, "${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
 //
 //        matcher.addURI(CONTENT_AUTHORITY, DurationsContract.TABLE_NAME, TASK_DURATION)
 //        matcher.addURI(CONTENT_AUTHORITY, "${DurationsContract.TABLE_NAME}/#", TASK_DURATION_ID)
@@ -56,8 +56,24 @@ class AppProvider : ContentProvider() {
         return true
     }
 
-    override fun getType(p0: Uri): String? {
-        TODO("Not yet implemented")
+    override fun getType(uri: Uri): String? {
+        val match = uriMatcher.match(uri)
+
+        return when (match) {
+            TASKS -> TasksContract.CONTENT_TYPE
+
+            TASKS_ID -> TasksContract.CONTENT_ITEM_TYPE
+
+            TIMINGS -> TimingsContract.CONTENT_TYPE
+
+            TIMINGS_ID -> TimingsContract.CONTENT_ITEM_TYPE
+
+//            TASK_DURATION -> DurationsContract.CONTENT_TYPE
+//
+//            TASK_DURATION_ID -> DurationsContract.CONTENT_ITEM_TYPE
+
+            else -> throw java.lang.IllegalArgumentException("Unknown uri: $uri")
+        }
     }
 
     override fun query(
@@ -86,17 +102,16 @@ class AppProvider : ContentProvider() {
 
             }
 
-//            TIMINGS -> {
-//                queryBuilder.tables = TimingsContract.TABLE_NAME
-//            }
-//
-//            TIMINGS_ID -> {
-//                queryBuilder.tables = TimingsContract.TABLE_NAME
-//                val timingId = TimingsContract.getId(uri)
-//                queryBuilder.appendWhere("${TimingsContract.Columns.ID} = ")
-//                queryBuilder.appendWhereEscapeString("$timingId")
+            TIMINGS -> {
+                queryBuilder.tables = TimingsContract.TABLE_NAME
+            }
 
-//            }
+            TIMINGS_ID -> {
+                queryBuilder.tables = TimingsContract.TABLE_NAME
+                val timingId = TimingsContract.getId(uri)
+                queryBuilder.appendWhere("${TimingsContract.Columns.ID} = ")
+                queryBuilder.appendWhereEscapeString("$timingId")
+            }
 //
 //            TASK_DURATION -> {
 //                queryBuilder.tables = DurationsContract.TABLE_NAME
@@ -109,11 +124,12 @@ class AppProvider : ContentProvider() {
 //                queryBuilder.appendWhereEscapeString("$durationId")
 
 //            }
-            else -> throw IllegalArgumentException("Unknown URI: $uri")
+            else -> throw IllegalArgumentException("Unknown uri: $uri")
         }
 
         val db = AppDataBase.getInstance(context!!).readableDatabase
-        val cursor = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder)
+        val cursor =
+            queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder)
         Log.d(TAG, ".query rows in returned cursor: ${cursor.count}") //TODO: Remove this line
 
         return cursor
