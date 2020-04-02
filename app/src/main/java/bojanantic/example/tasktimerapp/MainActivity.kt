@@ -19,7 +19,10 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 //        testInsert()
-        testUpdate()
+//        testUpdate()
+//        testUpdateMultipleEntries()
+//        testDelete()
+        testDeleteMultipleRows()
 
         val projection =
             arrayOf(TasksContract.Columns.TASK_NAME, TasksContract.Columns.TASK_SORT_ORDER)
@@ -79,6 +82,59 @@ class MainActivity : AppCompatActivity() {
         val rowsAffected = contentResolver.update(taskUri, values, null, null)
         Log.d(TAG, ".testUpdate: Number of rows updated: $rowsAffected")
 //        Log.d(TAG, "id (in uri) is ${TasksContract.getId(uri)}")
+    }
+
+    private fun testUpdateMultipleEntries() {
+        val values = ContentValues().apply {
+            put(TasksContract.Columns.TASK_SORT_ORDER, 99)
+            put(TasksContract.Columns.TASK_DESCRIPTION, "Completed")
+        }
+
+        val selection = TasksContract.Columns.TASK_SORT_ORDER + " = 2"
+
+        val rowsAffected = contentResolver.update(
+            TasksContract.CONTENT_URI,
+            values,
+            selection,
+            null
+        )
+        Log.d(TAG, ".testUpdateMultipleEntries: Number of rows updated: $rowsAffected")
+    }
+
+    private fun testUpdateUsingSelectionArgs() {
+        val values = ContentValues().apply {
+            put(TasksContract.Columns.TASK_SORT_ORDER, 999)
+            put(TasksContract.Columns.TASK_DESCRIPTION, "Completed")
+        }
+
+        val selection = TasksContract.Columns.TASK_SORT_ORDER + " = ?"
+        val selectionArgs = arrayOf("99")
+
+        val rowsAffected = contentResolver.update(
+            TasksContract.CONTENT_URI,
+            values,
+            selection,
+            selectionArgs
+        )
+        Log.d(TAG, ".testUpdateUsingSelectionArgs: Number of rows updated: $rowsAffected")
+    }
+
+    private fun testDelete() {
+        val taskUri = TasksContract.buildUriFromId(3)
+        val rowsAffected = contentResolver.delete(taskUri, null, null)
+        Log.d(TAG, ".testDelete: Number of rows deleted: $rowsAffected")
+    }
+
+    private fun testDeleteMultipleRows() {
+        val selection = TasksContract.Columns.TASK_DESCRIPTION + " = ?"
+        val selectionArgs = arrayOf("Completed")
+
+        val rowsAffected = contentResolver.delete(
+            TasksContract.CONTENT_URI,
+            selection,
+            selectionArgs
+        )
+        Log.d(TAG, ".testUpdateMultipleEntries: Number of rows updated: $rowsAffected")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
