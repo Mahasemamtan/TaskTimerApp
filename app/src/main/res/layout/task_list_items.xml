@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tli_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="66dp"
+        tools:layout_editor_absoluteY="118dp"
+        tools:text="Task Timer Application" />
+
+    <TextView
+        android:id="@+id/tli_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorSecondary"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="176dp"
+        tools:text="Write course notes and video description for Task Timer App" />
+
+    <ImageButton
+        android:id="@+id/tli_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/edit_button_description"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        tools:layout_editor_absoluteX="62dp"
+        tools:layout_editor_absoluteY="282dp" />
+
+    <ImageButton
+        android:id="@+id/tli_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/delete_button_description"
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        tools:layout_editor_absoluteX="190dp"
+        tools:layout_editor_absoluteY="283dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
