@@ -270,7 +270,7 @@ class AppProvider : ContentProvider() {
             }
             else -> throw java.lang.IllegalArgumentException("Unknown uri: $uri")
         }
-        Log.d(TAG, ".update: Exiting, returning: $count")
+        Log.d(TAG, ".delete: Exiting, returning: $count")
         return count
     }
 }
